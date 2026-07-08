@@ -1,0 +1,26 @@
+slug: qsar-dataset-curation
+title: "QSAR dataset curation"
+summary: "Standardize, deduplicate, and QSAR-ready a raw activity dataset."
+status: agno_available
+tags:
+  - qsar
+  - curation
+keywords:
+  - curate
+  - curation
+  - standardize
+  - deduplicate
+  - clean
+  - prepare
+required_tools:
+  - qsar_inspect_dataset_schema
+  - qsar_identify_columns
+  - qsar_curate_dataset
+  - qsar_summarize_curated_dataset
+optional_tools:
+  - qsar_write_curation_report
+artifact_outputs:
+  - clean_dataset_path
+  - standardization_report_path
+example_prompts:
+  - Curate this ChEMBL dataset into a QSAR-ready table for pIC50 modeling.

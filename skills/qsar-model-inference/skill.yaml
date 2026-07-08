@@ -1,0 +1,27 @@
+slug: qsar-model-inference
+title: "QSAR model inference"
+summary: "Run predictions with a registered model and report values with applicability domain."
+status: agno_available
+tags:
+  - qsar
+  - inference
+  - prediction
+keywords:
+  - predict
+  - prediction
+  - infer
+  - inference
+  - screen
+  - applicability domain
+  - lipophilicity
+required_tools:
+  - qsar_predict_from_smiles
+  - qsar_predict_from_csv
+optional_tools:
+  - qsar_recommend_catalog_model
+  - qsar_export_prediction_summary
+artifact_outputs:
+  - latest_predictions_csv
+  - prediction_summary
+example_prompts:
+  - Predict lipophilicity for these SMILES with the registered model.

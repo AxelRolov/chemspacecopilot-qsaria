@@ -1,0 +1,29 @@
+slug: qsar-curation
+title: "QSAR dataset curation"
+summary: "Curate, standardize, and QSAR-ready a raw activity dataset, then hand off to reporting."
+status: stable
+tags:
+  - qsar
+  - curation
+  - dataset
+keywords:
+  - curate
+  - curation
+  - clean
+  - prepare
+  - standardize
+  - deduplicate
+  - dataset schema
+required_tools:
+  - qsar_inspect_dataset_schema
+  - qsar_identify_columns
+  - qsar_curate_dataset
+  - qsar_summarize_curated_dataset
+optional_tools:
+  - qsar_write_curation_report
+  - qsar_init_report_payload
+  - qsar_export_latex_report
+expected_artifacts:
+  - clean_dataset_path
+  - standardization_report_path
+recommended_prompt: dataset_curation

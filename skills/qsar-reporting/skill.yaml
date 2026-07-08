@@ -1,0 +1,26 @@
+slug: qsar-reporting
+title: "QSAR reporting"
+summary: "Draft the final QSAR answer and export LaTeX/payload bundles in the required language."
+status: agno_available
+tags:
+  - qsar
+  - report
+  - latex
+keywords:
+  - report
+  - latex
+  - payload
+  - export
+  - summary
+required_tools:
+  - qsar_init_report_payload
+  - qsar_export_latex_report
+optional_tools:
+  - qsar_append_report_section
+  - qsar_build_prediction_report_payload
+  - qsar_export_latest_prediction_bundle
+artifact_outputs:
+  - qsar_latex_path
+  - report_bundle
+example_prompts:
+  - Generate the LaTeX report for the latest prediction.

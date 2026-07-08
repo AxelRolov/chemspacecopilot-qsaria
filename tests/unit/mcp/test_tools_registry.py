@@ -142,6 +142,7 @@ def test_every_spec_has_discoverability_group():
         "peptide_design",
         "synplanner",
         "workflow",
+        "qsar",
     }
 
     groups = {spec.group for spec in all_specs()}

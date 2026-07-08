@@ -1,0 +1,30 @@
+slug: qsar-registry
+title: "QSAR model registry / catalog"
+summary: "Inventory backends and catalog models; summarize, compare, or recommend models, then report."
+status: stable
+tags:
+  - qsar
+  - registry
+  - catalog
+keywords:
+  - catalog
+  - catalogue
+  - registry
+  - register
+  - model summary
+  - model comparison
+  - recommend
+  - backend
+  - capability
+  - capabilities
+  - available models
+required_tools:
+  - qsar_describe_catalog
+  - qsar_list_catalog_models
+optional_tools:
+  - qsar_describe_backends
+  - qsar_summarize_catalog_model
+  - qsar_recommend_catalog_model
+expected_artifacts:
+  - catalog_summary
+recommended_prompt: model_registry

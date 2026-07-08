@@ -1,0 +1,28 @@
+slug: qsar-model-training
+title: "QSAR model training"
+summary: "Train and validate a QSAR model on a curated dataset using a chosen backend."
+status: agno_available
+tags:
+  - qsar
+  - training
+keywords:
+  - train
+  - training
+  - fit
+  - chemprop
+  - lightgbm
+  - tabicl
+  - benchmark
+required_tools:
+  - qsar_prepare_training_dataset
+  - qsar_train_model
+optional_tools:
+  - qsar_train_chemprop
+  - qsar_train_lightgbm
+  - qsar_train_tabicl
+  - qsar_describe_training_environment
+artifact_outputs:
+  - trained_model_path
+  - training_metrics
+example_prompts:
+  - Train a LightGBM QSAR model for lipophilicity on the curated dataset.

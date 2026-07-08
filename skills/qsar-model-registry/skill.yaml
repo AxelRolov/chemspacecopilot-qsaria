@@ -1,0 +1,29 @@
+slug: qsar-model-registry
+title: "QSAR model registry"
+summary: "Govern the QSAR catalog: list, summarize, compare, recommend, register, and persist models."
+status: agno_available
+tags:
+  - qsar
+  - registry
+  - catalog
+keywords:
+  - catalog
+  - registry
+  - register
+  - recommend
+  - backend
+  - available models
+required_tools:
+  - qsar_describe_catalog
+  - qsar_list_catalog_models
+optional_tools:
+  - qsar_describe_backends
+  - qsar_summarize_catalog_model
+  - qsar_recommend_catalog_model
+  - qsar_register_model
+  - qsar_persist_registered_model
+artifact_outputs:
+  - catalog_summary
+  - registered_model
+example_prompts:
+  - Which QSAR backends are available and which model do you recommend for solubility?

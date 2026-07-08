@@ -1,0 +1,23 @@
+slug: qsar-export
+title: "QSAR report export"
+summary: "Export the latest QSAR prediction/training state to a LaTeX report or payload bundle."
+status: stable
+tags:
+  - qsar
+  - export
+  - latex
+  - report
+keywords:
+  - latex
+  - payload
+  - tex
+  - export
+required_tools:
+  - qsar_export_latex_report
+optional_tools:
+  - qsar_build_prediction_report_payload
+  - qsar_export_latest_prediction_bundle
+expected_artifacts:
+  - qsar_latex_path
+  - report_bundle
+recommended_prompt: qsar_report

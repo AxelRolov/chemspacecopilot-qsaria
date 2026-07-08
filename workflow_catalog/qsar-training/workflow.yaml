@@ -1,0 +1,34 @@
+slug: qsar-training
+title: "QSAR model training"
+summary: "Curate (if needed), train and validate a QSAR model, register it, and report metrics."
+status: stable
+tags:
+  - qsar
+  - training
+  - model
+keywords:
+  - train
+  - training
+  - fit
+  - validate
+  - validation
+  - benchmark
+  - chemprop
+  - lightgbm
+  - tabicl
+required_tools:
+  - qsar_prepare_training_dataset
+  - qsar_train_model
+  - qsar_register_model
+optional_tools:
+  - qsar_curate_dataset
+  - qsar_train_chemprop
+  - qsar_train_lightgbm
+  - qsar_train_tabicl
+  - qsar_persist_registered_model
+  - qsar_export_latex_report
+expected_artifacts:
+  - clean_dataset_path
+  - trained_model_path
+  - training_metrics
+recommended_prompt: qsar_training

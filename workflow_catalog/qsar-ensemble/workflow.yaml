@@ -1,0 +1,20 @@
+slug: qsar-ensemble
+title: "QSAR ensemble"
+summary: "Create or summarize a consensus ensemble over compatible catalog models, then report."
+status: stable
+tags:
+  - qsar
+  - ensemble
+  - consensus
+keywords:
+  - ensemble
+  - consensus
+required_tools:
+  - qsar_list_catalog_models
+  - qsar_recommend_catalog_model
+optional_tools:
+  - qsar_register_catalog_model
+  - qsar_summarize_model
+expected_artifacts:
+  - ensemble_summary
+recommended_prompt: model_registry

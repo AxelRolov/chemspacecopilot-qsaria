@@ -1,0 +1,29 @@
+slug: qsar-prediction
+title: "QSAR prediction / inference"
+summary: "Run predictions with a registered/selected model and report results and applicability domain."
+status: stable
+tags:
+  - qsar
+  - prediction
+  - inference
+keywords:
+  - predict
+  - prediction
+  - infer
+  - inference
+  - screen
+  - applicability domain
+  - lipophilicity
+required_tools:
+  - qsar_predict_from_smiles
+  - qsar_predict_from_csv
+optional_tools:
+  - qsar_recommend_catalog_model
+  - qsar_register_catalog_model
+  - qsar_export_prediction_summary
+  - qsar_build_prediction_report_payload
+  - qsar_export_latest_prediction_bundle
+expected_artifacts:
+  - latest_predictions_csv
+  - prediction_summary
+recommended_prompt: model_inference
