@@ -123,6 +123,9 @@ MOLECULAR_DESIGNER_INSTRUCTIONS = [
 ]
 
 QSAR_TRAINING_INSTRUCTIONS = [
+    "Consult the `qsar-model-training` skill and the `qsar-training` workflow via the "
+    "Skills/Workflows tools; the catalog is the procedural source of truth — fetch the "
+    "relevant entry before a multi-tool task.",
     "Step 1: Focus only on QSAR model training and evaluation.",
     "  - Do not search for datasets yourself unless a curated dataset path is explicitly missing and the QSAR coordinator asks you to stop on that blocker.",
     "  - Do not perform free-form interpretation of predictions or business conclusions.",
@@ -223,6 +226,9 @@ QSAR_TRAINING_INSTRUCTIONS = [
 
 
 MODEL_REGISTRY_INSTRUCTIONS = [
+    "Consult the `qsar-model-registry` skill and the `qsar-registry` / `qsar-ensemble` "
+    "workflows via the Skills/Workflows tools; the catalog is the procedural source of "
+    "truth — fetch the relevant entry before a multi-tool task.",
     "Step 1: Focus only on model governance and persistence.",
     "  - Do not train models.",
     "  - Do not choose business recommendations or interpret predictions.",
@@ -261,6 +267,9 @@ MODEL_REGISTRY_INSTRUCTIONS = [
 
 
 MODEL_INFERENCE_INSTRUCTIONS = [
+    "Consult the `qsar-model-inference` skill and the `qsar-prediction` workflow via the "
+    "Skills/Workflows tools; the catalog is the procedural source of truth — fetch the "
+    "relevant entry before a multi-tool task.",
     "Step 1: Focus only on model selection, registration into session, and inference execution.",
     "  - Do not train models.",
     "  - Do not perform dataset curation.",
@@ -303,6 +312,9 @@ MODEL_INFERENCE_INSTRUCTIONS = [
 
 
 QSAR_REPORT_INSTRUCTIONS = [
+    "Consult the `qsar-reporting` skill and the `qsar-export` workflow via the "
+    "Skills/Workflows tools; the catalog is the procedural source of truth — fetch the "
+    "relevant entry before a multi-tool task.",
     "Step 1: You are the only QSAR agent allowed to draft the final user-facing answer.",
     "  - Other QSAR agents produce operational outputs and structured handoffs.",
     "  - You transform those handoffs into the final response for the user.",
@@ -548,6 +560,9 @@ PEPTIDE_DESIGNER_INSTRUCTIONS = [
 ]
 
 DATASET_CURATION_INSTRUCTIONS = [
+    "Consult the `qsar-dataset-curation` skill and the `qsar-curation` workflow via "
+    "the Skills/Workflows tools; the catalog is the procedural source of truth — fetch "
+    "the relevant entry before a multi-tool task.",
     "Step 1: Focus only on preparing a QSAR-ready dataset.",
     "  - Do not train models.",
     "  - Do not choose predictive models.",

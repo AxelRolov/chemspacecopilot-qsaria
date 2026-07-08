@@ -795,7 +795,11 @@ class DatasetCurationFactory(BaseAgentFactory):
             - prediction execution
             - prediction analysis
             """,
-            tools=[DatasetCurationToolkit()],
+            tools=[
+                DatasetCurationToolkit(),
+                SkillToolkit(),
+                WorkflowToolkit(),
+            ],
             instructions=DATASET_CURATION_INSTRUCTIONS,
             session_state=copy_qsar_session_state(),
         )
@@ -825,6 +829,8 @@ class QSARTrainingFactory(BaseAgentFactory):
                 ActivityCliffToolkit(),
                 MolecularFeatureToolkit(),
                 PointerPandasTools(),
+                SkillToolkit(),
+                WorkflowToolkit(),
             ],
             instructions=QSAR_TRAINING_INSTRUCTIONS,
             session_state=copy_qsar_session_state(),
@@ -851,6 +857,8 @@ class ModelRegistryFactory(BaseAgentFactory):
             tools=[
                 *qsar_context.prediction_tools(),
                 qsar_context.ensemble_toolkit(),
+                SkillToolkit(),
+                WorkflowToolkit(),
             ],
             instructions=MODEL_REGISTRY_INSTRUCTIONS,
             session_state=copy_qsar_session_state(),
@@ -878,6 +886,8 @@ class ModelInferenceFactory(BaseAgentFactory):
                 *qsar_context.prediction_tools(include_inference=True),
                 qsar_context.ensemble_toolkit(),
                 PointerPandasTools(),
+                SkillToolkit(),
+                WorkflowToolkit(),
             ],
             instructions=MODEL_INFERENCE_INSTRUCTIONS,
             session_state=copy_qsar_session_state(),
@@ -904,6 +914,8 @@ class QSARReportFactory(BaseAgentFactory):
             tools=[
                 qsar_context.reporting_toolkit,
                 PointerPandasTools(),
+                SkillToolkit(),
+                WorkflowToolkit(),
             ],
             instructions=QSAR_REPORT_INSTRUCTIONS,
             session_state=copy_qsar_session_state(),
