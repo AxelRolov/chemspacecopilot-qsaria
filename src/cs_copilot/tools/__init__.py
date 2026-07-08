@@ -62,6 +62,7 @@ from .io.report_export import save_markdown_report, save_rich_report
 from .io.session_memory import SessionMemoryToolkit
 from .io.session_toolkit import SessionToolkit
 from .io.skill_toolkit import SkillToolkit
+from .io.workflow_toolkit import WorkflowToolkit
 from .reporting import QSARReportingToolkit
 
 # Backwards compatibility alias
@@ -75,6 +76,7 @@ __all__ = [
     "QSARReportingToolkit",
     "SessionMemoryToolkit",
     "SkillToolkit",
+    "WorkflowToolkit",
     "GTMToolkit",
     "BaseChemistryToolkit",
     "ChemicalSimilarityToolkit",
