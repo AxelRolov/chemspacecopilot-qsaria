@@ -20,6 +20,7 @@ from .tool_specs import (
     gtm,
     llm,
     pandas,
+    qsar,
     reporting,
     robustness,
     session,
@@ -50,6 +51,7 @@ def iter_specs() -> Iterable[ToolSpec]:
     yield from _with_group(design.MOLECULAR_SPECS, "molecular_design")
     yield from _with_group(design.PEPTIDE_SPECS, "peptide_design")
     yield from _with_group(synplanner.SPECS, "synplanner")
+    yield from _with_group(qsar.SPECS, "qsar")
 
 
 def all_specs() -> List[ToolSpec]:
