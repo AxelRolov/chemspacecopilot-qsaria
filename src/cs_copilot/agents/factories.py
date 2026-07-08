@@ -60,7 +60,7 @@ from .prompts import (
     ROBUSTNESS_EVALUATION_INSTRUCTIONS,
     SYNPLANNER_INSTRUCTIONS,
 )
-from .qsar_workflow import copy_qsar_session_state
+from .qsar_session import copy_qsar_session_state
 
 
 @dataclass

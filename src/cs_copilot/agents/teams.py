@@ -18,7 +18,8 @@ from cs_copilot.utils.resources import analyze_resources
 from .config import CS_COPILOT_MEMORY_DB  # optional now; kept for compatibility
 from .factories import AgentCreationError, QSARServiceContext
 from .prompts import AGENT_TEAM_INSTRUCTIONS
-from .qsar_workflow import copy_qsar_session_state, describe_qsar_routes, plan_qsar_workflow
+from .qsar_flow import describe_qsar_routes, plan_qsar_workflow
+from .qsar_session import copy_qsar_session_state
 from .registry import create_agent
 
 

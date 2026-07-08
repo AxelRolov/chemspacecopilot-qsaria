@@ -6,12 +6,14 @@ from cs_copilot.agents.factories import (
     QSARTrainingFactory,
 )
 from cs_copilot.agents.prompts import MODEL_INFERENCE_INSTRUCTIONS, QSAR_REPORT_INSTRUCTIONS
-from cs_copilot.agents.qsar_workflow import (
+from cs_copilot.agents.qsar_flow import (
+    QSAR_KIND_TO_SLUG,
     QSARWorkflowKind,
     classify_qsar_workflow,
-    copy_qsar_session_state,
+    describe_qsar_routes,
     plan_qsar_workflow,
 )
+from cs_copilot.agents.qsar_session import copy_qsar_session_state
 
 
 class SentinelTool:
@@ -132,3 +134,17 @@ def test_qsar_factory_tool_boundaries_use_shared_context():
 def test_prompt_tool_ownership_is_consistent():
     assert not any("export_latest_prediction_report_bundle" in item for item in MODEL_INFERENCE_INSTRUCTIONS)
     assert any("QSARReportingToolkit" in item for item in QSAR_REPORT_INSTRUCTIONS)
+
+
+def test_qsar_routes_map_to_real_catalog_workflows():
+    """Every deterministic route resolves to a workflow_catalog/qsar-* contract."""
+    from cs_copilot.workflows import get_workflow
+
+    assert set(QSAR_KIND_TO_SLUG) == set(QSARWorkflowKind)
+
+    routes_text = describe_qsar_routes()
+    for kind, slug in QSAR_KIND_TO_SLUG.items():
+        # The catalog entry exists (Router route -> declarative contract).
+        assert get_workflow(slug).slug == slug
+        # The prompt-safe route description references the catalog slug.
+        assert slug in routes_text

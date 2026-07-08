@@ -54,6 +54,7 @@ Agent Capabilities Breakdown:
 _FACTORY_EXPORTS = {"AgentConfig", "AgentCreationError", "BaseAgentFactory"}
 _REGISTRY_EXPORTS = {"create_agent", "get_registry", "list_available_agent_types"}
 _TEAM_EXPORTS = {"get_cs_copilot_agent_team", "get_qsar_agent_team"}
+_FLOW_EXPORTS = {"build_qsar_workflow"}
 _UTIL_EXPORTS = {"get_last_agent_reply"}
 
 
@@ -64,6 +65,8 @@ def __getattr__(name: str):
         from . import registry as module
     elif name in _TEAM_EXPORTS:
         from . import teams as module
+    elif name in _FLOW_EXPORTS:
+        from . import qsar_flow as module
     elif name in _UTIL_EXPORTS:
         from . import utils as module
     else:
@@ -82,6 +85,8 @@ __all__ = [
     # Team coordination
     "get_cs_copilot_agent_team",
     "get_qsar_agent_team",
+    # Native Agno QSAR Workflow engine (deterministic Router + Steps)
+    "build_qsar_workflow",
     # Utilities
     "get_last_agent_reply",
     # Configuration and exceptions

@@ -1,18 +1,31 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""Deterministic QSAR workflow contracts used by the agent layer."""
+"""Deterministic QSAR routing, realized as a native Agno ``Workflow``.
+
+This replaces the old regex-classifier module (``qsar_workflow.py``). Route
+*definitions* live in the ``workflow_catalog/qsar-*`` contracts (their
+``keywords:`` mirror the triggers below); this module owns the executable
+selector and compiles the routes into an Agno ``Workflow`` whose first step is a
+``Router`` that dispatches to a fixed ``Steps`` sequence of QSAR agents. The
+selector is deterministic (no LLM), preserving the guarantee the old classifier
+provided.
+"""
 
 from __future__ import annotations
 
-import copy
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
+
+from agno.models.base import Model
+from agno.workflow import Router, Step, Steps, Workflow
+
+from .qsar_session import copy_qsar_session_state
 
 
 class QSARWorkflowKind(str, Enum):
-    """Known coordinator-level QSAR workflows."""
+    """Known deterministic QSAR routes."""
 
     CURATION_ONLY = "curation_only"
     TRAINING = "training"
@@ -36,6 +49,16 @@ QSAR_AGENT_ROUTES: Dict[QSARWorkflowKind, Tuple[str, ...]] = {
     QSARWorkflowKind.EXPORT_ONLY: ("qsar_report",),
 }
 
+# Route -> workflow_catalog slug (the declarative contract for each route).
+QSAR_KIND_TO_SLUG: Dict[QSARWorkflowKind, str] = {
+    QSARWorkflowKind.CURATION_ONLY: "qsar-curation",
+    QSARWorkflowKind.TRAINING: "qsar-training",
+    QSARWorkflowKind.PREDICTION: "qsar-prediction",
+    QSARWorkflowKind.REGISTRY: "qsar-registry",
+    QSARWorkflowKind.ENSEMBLE: "qsar-ensemble",
+    QSARWorkflowKind.EXPORT_ONLY: "qsar-export",
+}
+
 QSAR_AGENT_NAMES: Dict[str, str] = {
     "dataset_curation": "Dataset Curation",
     "qsar_training": "QSAR Training",
@@ -51,7 +74,9 @@ _FRENCH_SIGNAL_RE = re.compile(
     re.I,
 )
 _EXPORT_RE = re.compile(r"\b(latex|payload|tex|export|exporte|g[eé]n[eè]re|g[eé]n[eé]rer)\b", re.I)
-_PREDICTION_CONTEXT_RE = re.compile(r"\b(latest|derni[eè]re|prediction|pr[eé]diction|payload)\b", re.I)
+_PREDICTION_CONTEXT_RE = re.compile(
+    r"\b(latest|derni[eè]re|prediction|pr[eé]diction|payload)\b", re.I
+)
 _ENSEMBLE_RE = re.compile(r"\b(ensemble|consensus)\b", re.I)
 _ENSEMBLE_ACTION_RE = re.compile(
     r"\b(create|build|make|summari[sz]e|list|inspect|compare|cr[eé]e|créer|r[eé]sume)\b",
@@ -82,7 +107,7 @@ _REGISTRY_RE = re.compile(
 
 @dataclass(frozen=True)
 class QSARWorkflowPlan:
-    """A deterministic routing decision for the QSAR coordinator."""
+    """A deterministic routing decision for the QSAR sub-system."""
 
     workflow: QSARWorkflowKind
     route: Tuple[str, ...]
@@ -90,10 +115,15 @@ class QSARWorkflowPlan:
     export_only: bool = False
     rerun_prediction: bool = True
 
+    @property
+    def slug(self) -> str:
+        return QSAR_KIND_TO_SLUG[self.workflow]
+
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
         payload["workflow"] = self.workflow.value
         payload["route"] = list(self.route)
+        payload["slug"] = self.slug
         return payload
 
 
@@ -106,8 +136,8 @@ def detect_report_language(message: str) -> str:
 def classify_qsar_workflow(message: str) -> QSARWorkflowPlan:
     """Classify a user request into the supported QSAR workflow routes.
 
-    The classifier is intentionally conservative: it enforces the same high-level
-    routes the prompts describe, while leaving domain details to the specialists.
+    Ordered, conservative, and deterministic — the same high-level routes the
+    ``workflow_catalog/qsar-*`` contracts describe.
     """
     text = message or ""
     language = detect_report_language(text)
@@ -175,58 +205,74 @@ def describe_qsar_routes() -> str:
     lines = []
     for workflow, route in QSAR_AGENT_ROUTES.items():
         readable_route = " -> ".join(QSAR_AGENT_NAMES[item] for item in route)
-        lines.append(f"- {workflow.value}: {readable_route}")
+        lines.append(f"- {QSAR_KIND_TO_SLUG[workflow]}: {readable_route}")
     return "\n".join(lines)
 
 
-def default_prediction_state() -> Dict[str, Any]:
-    return {
-        "registered": {},
-        "last_prediction": {},
-        "prediction_history": [],
-        "catalog_recommendations": {},
-        "training_runs": [],
-        "active_training_run": None,
+def build_qsar_workflow(
+    model: Model,
+    *,
+    markdown: bool = True,
+    debug_mode: bool = False,
+    enable_mlflow_tracking: bool = True,
+    session_id: Optional[str] = None,
+    db: Any = None,
+) -> Workflow:
+    """Compile the deterministic QSAR routes into a native Agno ``Workflow``.
+
+    The workflow's single step is a ``Router`` whose selector classifies the
+    request (deterministically, via :func:`classify_qsar_workflow`) and returns
+    the matching route as a ``Steps`` sequence of QSAR agents. ``qsar_report`` is
+    always the terminal step, so it drafts the final user-facing answer.
+    """
+    # Imported here to avoid a circular import at module load (factories imports
+    # qsar_session; registry imports factories).
+    from .factories import QSARServiceContext
+    from .registry import create_agent
+
+    qsar_context = QSARServiceContext.create()
+    agent_params = {
+        "markdown": markdown,
+        "debug_mode": debug_mode,
+        "enable_mlflow_tracking": enable_mlflow_tracking,
+        "qsar_context": qsar_context,
+    }
+    agents = {
+        agent_type: create_agent(agent_type, model=model, **agent_params)
+        for agent_type in QSAR_AGENT_NAMES
     }
 
+    route_choices = []
+    routes_by_kind: Dict[QSARWorkflowKind, Steps] = {}
+    for kind, route in QSAR_AGENT_ROUTES.items():
+        slug = QSAR_KIND_TO_SLUG[kind]
+        # Fresh Step wrappers per route (agents are shared) so choices never
+        # collide on step identity.
+        steps = [
+            Step(name=f"{slug}:{QSAR_AGENT_NAMES[a]}", agent=agents[a]) for a in route
+        ]
+        sequence = Steps(name=slug, steps=steps)
+        routes_by_kind[kind] = sequence
+        route_choices.append(sequence)
 
-def default_qsar_session_state() -> Dict[str, Any]:
-    """Return the shared QSAR state skeleton used by all isolated QSAR agents."""
-    return {
-        "prediction_models": default_prediction_state(),
-        "prediction_outputs": {
-            "latest_predictions_csv": None,
-            "latest_summary": None,
-        },
-        "qsar_curation": {
-            "last_request": {},
-            "last_result": {},
-            "history": [],
-        },
-        "qsar_training": {
-            "last_request": {},
-            "last_result": {},
-        },
-        "qsar_registry": {
-            "last_request": {},
-            "last_result": {},
-        },
-        "qsar_inference": {
-            "last_request": {},
-            "last_result": {},
-        },
-        "qsar_report": {
-            "last_request": {},
-            "last_result": {},
-        },
-        "qsar_workflow": {
-            "last_plan": {},
-            "history": [],
-        },
-    }
+    def _select_route(step_input):
+        text = step_input.get_input_as_string() or ""
+        plan = classify_qsar_workflow(text)
+        return routes_by_kind[plan.workflow]
 
+    router = Router(
+        name="qsar-router",
+        description="Deterministically route a QSAR request to its fixed agent sequence.",
+        selector=_select_route,
+        choices=route_choices,
+    )
 
-def copy_qsar_session_state() -> Dict[str, Any]:
-    """Return an independent copy of the default QSAR state."""
-    return copy.deepcopy(default_qsar_session_state())
-
+    return Workflow(
+        name="QSAR Workflow",
+        description="Isolated QSAR sub-system: deterministic curation/training/"
+        "prediction/registry/ensemble/export routes.",
+        steps=[router],
+        session_state=copy_qsar_session_state(),
+        session_id=session_id,
+        db=db,
+    )
