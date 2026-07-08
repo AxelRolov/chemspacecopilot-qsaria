@@ -263,8 +263,8 @@ def parse_activity_cliff_config(
         raise ValueError(
             "activity_cliff_feedback_loops must be between 1 and 3 when feedback loops are requested."
         )
-    if not (0.0 < float(activity_cliff_similarity_threshold) <= 1.0):
-        raise ValueError("activity_cliff_similarity_threshold must be in (0, 1].")
+    if not (0.0 <= float(activity_cliff_similarity_threshold) <= 1.0):
+        raise ValueError("activity_cliff_similarity_threshold must be in [0, 1].")
     if int(activity_cliff_top_k_neighbors) < 1:
         raise ValueError("activity_cliff_top_k_neighbors must be >= 1.")
     if not (0.0 < float(activity_cliff_flag_threshold) <= 1.0):

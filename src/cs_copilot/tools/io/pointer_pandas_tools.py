@@ -666,8 +666,10 @@ class PointerPandasTools(PandasTools):
         if not operation:
             raise ValueError("operation cannot be empty")
 
-        operation = _normalize_operation_name(operation)
+        # Parse the LLM pseudo-op df['col'].describe() on the RAW operation, before
+        # _normalize_operation_name() strips the trailing "()" the regex needs.
         described_column = _parse_series_describe_expression(operation)
+        operation = _normalize_operation_name(operation)
         if described_column is not None:
             operation = "describe"
             operation_parameters = {"column": described_column}
@@ -799,6 +801,9 @@ class PointerPandasTools(PandasTools):
                         "describe() 'column' parameter must include at least one column"
                     )
                 _validate_columns(df, columns, param_name="column")
+                if described_column is not None and len(columns) == 1:
+                    # df['col'].describe() pseudo-op → Series-style describe payload.
+                    return _serialize_series(df[columns[0]].describe())
                 df = df[columns]
 
             # Handle unique() - it's a Series method, not DataFrame
