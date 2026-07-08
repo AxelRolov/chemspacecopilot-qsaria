@@ -10,6 +10,7 @@ The system uses a **Factory Pattern + Registry** for agent creation.
 - `registry.py` — Dynamic agent registry with auto-discovery
 - `teams.py` — Multi-agent team coordination using the Agno framework
 - `prompts.py` — Agent instructions and system prompts
+- `skills/` — Shared reusable workflow procedures consumed by Agno and MCP
 
 ## Runtime Team Agents
 
@@ -19,9 +20,24 @@ The system uses a **Factory Pattern + Registry** for agent creation.
 | **GTM Agent** | Unified GTM workflows: build, load, density, activity, projection, and GTM sampling support |
 | **Chemoinformatician** | Downstream chemoinformatics analysis including scaffold, similarity, clustering, and SAR workflows |
 | **Report Generator** | Formats analysis outputs into reports and visual artifacts |
-| **Autoencoder** | Small-molecule generation via LSTM autoencoders, including standalone and GTM-guided modes |
-| **Peptide WAE** | Peptide generation, latent-space GTM workflows, and DBAASP-backed peptide activity landscapes |
-| **SynPlanner** | Retrosynthetic planning and route visualization for target molecules |
+| **Molecular Designer** | Small-molecule design via autoencoder and LLM engines, including standalone and GTM-guided modes |
+| **Peptide Designer** | Peptide design via WAE and LLM engines, latent-space GTM workflows, and DBAASP-backed peptide activity landscapes |
+| **SynPlanner** | Retrosynthetic planning and route visualization for target molecules; requires the optional `synplanner` extra |
+
+The team coordinator also has a read-only Skills toolkit (`list_skills`, `search_skills`, `fetch_skill`) so it can consult the same reusable workflow procedures exposed through MCP.
+
+## Prompt / Skill Ownership
+
+Agent prompts in `src/cs_copilot/agents/prompts.py` define role identity,
+global routing policy, clarification rules, evidence standards, session-memory
+conventions, and artifact formatting. They should not contain long mutable
+tool sequences.
+
+Reusable task procedures live in `skills/<slug>/SKILL.md`. MCP-facing workflow
+contracts live in `workflow_catalog/<slug>/WORKFLOW.md` and define preflight
+tools, required tool groups, expected artifacts, and recommended prompts. When
+behavior changes for a domain workflow, update the skill or workflow catalog
+first and keep prompts high-level.
 
 ## Additional Available Agent
 
