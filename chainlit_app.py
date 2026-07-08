@@ -20,6 +20,7 @@ from chainlit.input_widget import Select, Switch
 from chainlit.types import ThreadDict
 from dotenv import load_dotenv
 
+from cs_copilot.agents.qsar_flow import build_qsar_workflow
 from cs_copilot.agents.teams import get_cs_copilot_agent_team, get_qsar_agent_team
 from cs_copilot.model_config import _is_retriable, arun_with_retry, load_model_from_config
 from cs_copilot.storage import S3
@@ -113,9 +114,24 @@ def _default_team_mode() -> str:
     return "qsar" if team_mode == "qsar" else "main"
 
 
+def _qsar_engine() -> str:
+    """QSAR execution engine: 'team' (LLM coordinator, default) or 'workflow'.
+
+    The 'workflow' value runs the native Agno ``Workflow`` (deterministic
+    ``Router`` + ``Steps``) instead of the LLM-coordinated Team. Kept behind a
+    flag so the default runtime is unchanged until the Workflow streaming path is
+    validated in the live UI.
+    """
+    engine = os.getenv("CS_COPILOT_QSAR_ENGINE", "team").strip().lower()
+    return "workflow" if engine == "workflow" else "team"
+
+
 def _create_session_agent(team_mode: str | None = None):
-    """Create the configured team for the current app deployment."""
+    """Create the configured team (or QSAR workflow) for the current deployment."""
     team_mode = (team_mode or _default_team_mode()).strip().lower()
+    if team_mode == "qsar" and _qsar_engine() == "workflow":
+        logger.info("Initializing QSAR engine: native Agno Workflow")
+        return build_qsar_workflow(model)
     team_factory = get_qsar_agent_team if team_mode == "qsar" else get_cs_copilot_agent_team
     logger.info("Initializing session agent team: %s", team_mode)
     return team_factory(
